@@ -1,0 +1,21 @@
+#cloud-config
+packages:
+  - httpd
+  - php
+  - php-mysqlnd
+write_files:
+  - path: /var/www/html/calldb.php
+    content: |
+      <?php
+      $conn = new mysqli('mydatabase.internal.com', 'root', 'secret', 'test');
+      $sql = 'SELECT * FROM mytable';
+      $result = $conn->query($sql);
+      while($row = $result->fetch_assoc()) { echo 'the value is: ' . $row['mycol'] ;}
+      $conn->close();
+      ?>
+runcmd:
+  - systemctl start httpd.service
+  - systemctl enable httpd.service
+  - chkconfig httpd on
+
+
